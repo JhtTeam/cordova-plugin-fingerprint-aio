@@ -70,8 +70,20 @@ import LocalAuthentication
                     pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: "Success");
                 }else {
                     // Check if there is an error
-                    if error != nil {
-                        pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: "Error: \(String(describing: error?.localizedDescription))")
+                    if let err = error {
+                        switch err._code {
+                            case LAError.Code.userCancel.rawValue:
+                                print("LAError.Code.userCancel.rawValue");
+                                pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs:"")
+                                break;
+                            case LAError.Code.systemCancel.rawValue:
+                                print("LAError.Code.systemCancel.rawValue:")
+                            case LAError.Code.userFallback.rawValue:
+                                print("Password option selected")
+                            default:
+                                print("None of theme")
+                                pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: error?.localizedDescription)
+                            }
                     }
                 }
                 self.commandDelegate.send(pluginResult, callbackId:command.callbackId);
